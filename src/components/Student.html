@@ -1,0 +1,173 @@
+<!-- The below code is for table creation and looping through array of student data  -->
+
+<div>
+    <div class="container">
+      <div class="row mt-3">
+        <div class="col-lg-6">
+          <h3 class="text-info">Registered Students</h3>
+        </div>
+        <div class="col-lg-6">
+          <b-button variant="primary" @click="showModal = true">Add Student</b-button>
+        </div>
+      </div>
+      <hr class="bg-info">
+      <div class="alert alert-danger" v-if="errorMsg">Something went wrong</div>
+      <div class="alert alert-success" v-if="successMsg">Data added successfully</div>
+      <div class="row">
+        <div class="col-lg-12">
+          <table class="table table-bordered table-stripped">
+            <thead>
+              <tr class="text-center bg-info text-light">    
+                <th>Firstname</th>
+                <th>Lastname</th>
+                <th>Phone no</th>
+                <th>Email</th>
+                <th>Address</th>
+                <th>Edit</th>
+                <th>Delete</th>
+                <th>PayFee</th>
+                </tr>
+            </thead>
+            <tbody>
+              <tr class="text-center" v-for="data in studentData" :key="data">  
+                <td>{{ data.firstName}}</td>
+                <td>{{ data.lastName}}</td>
+                <td>{{ data.phone}}</td>
+                <td>{{ data.email}}</td>
+                <td>{{ data.address}}</td>
+                <td><b-button variant="primary" v-on:click="editItem(studentData.indexOf(data),data)">Edit</b-button></td>
+                <td><b-button variant="danger" v-on:click="deleteItem(studentData.indexOf(data))">Delete</b-button></td>
+                <td><b-button variant="primary" v-on:click="payFees(data.firstName)">Pay Fees</b-button></td>
+                </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- Modal for Delete confirmation !-->
+    <div id = "overlay" v-if="showDeleteModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class = "modal-header">
+                    <h5 class = "modal-title">Add Students</h5>
+                    <button type="button" class="close" @click="showDeleteModal = false">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                 <div class = "modal-body p-4">
+                   <h4 class="text-danger">Do you want to delete this record?</h4>
+                   <hr>
+                   <button class="btn btn-danger btn-lg mr-3" v-on:click = "confirmDelete">Yes</button>
+                   &nbsp;&nbsp;&nbsp;&nbsp;
+                   <button class="btn btn-success btn-lg mr-3" @click="showDeleteModal = false">No</button>
+
+                 </div>
+            </div>
+        </div>
+      </div>
+
+
+ <!-- Modal for Fee payment -->
+      <div id = "overlay" v-if="showPayDialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class = "modal-header">
+                    <h5 class = "modal-title">Add Students</h5>
+                    <button type="button" class="close" @click="showDeleteModal = false">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                 <div class = "modal-body p-4">
+                   <h4 class="text-danger">Do you want to continue to pay the fee for {{this.firstName}} ?</h4>
+                   <hr>
+                   <button class="btn btn-danger btn-lg mr-3" v-on:click = "showPayDialog=false">Yes</button>
+                   &nbsp;&nbsp;&nbsp;&nbsp;
+                   <button class="btn btn-success btn-lg mr-3" @click="showPayDialog = false">No</button>
+
+                 </div>
+            </div>
+        </div>
+      </div>
+
+<!-- This Modal displays when the user clicks on Edit -->
+
+      <div id = "overlay" v-if="showEditModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class = "modal-header">
+                    <h5 class = "modal-title">Update Students</h5>
+                    <button type="button" class="close" @click="showEditModal = false">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                 <div class = "modal-body p-4">
+                     <form v-on:submit.prevent = "updateStudentData">
+                         <div class="form-group">
+                         <input type = "text" name = "firstName" class="form-control form-control-lg" placeholder="firstName" v-model="currentUser.firstName"> 
+                         </div>
+                         <div class="form-group">
+                         <input type = "text" name = "lastName" class="form-control form-control-lg" placeholder="lastName" v-model="currentUser.lastName"> 
+                         </div>
+                         <div class="form-group">
+                         <input type = "email" name = "email" class="form-control form-control-lg" placeholder="email" v-model="currentUser.email"> 
+                         </div>
+                         <div class="form-group">
+                         <input type = "number" name = "number" class="form-control form-control-lg" placeholder="phone number" v-model="currentUser.phone"> 
+                         </div>
+                         <div class="form-group">
+                         <input type = "text" name = "address" class="form-control form-control-lg" placeholder="address" v-model="currentUser.address"> 
+                         </div>
+                         <div class="form-group">
+                         <b-button type = "submit" variant="primary" class="btn mr-3 btn-lg" @click="showEditModal = false">upddate</b-button>
+                         <b-button variant="danger" class="btn mr-3 btn-lg" @click="showEditModal = false">Cancel</b-button>
+                         </div>
+                         </form>
+                 </div>
+            </div>
+        </div>
+      </div>
+    
+
+    
+    <!-- This Modal displays when the user clicks on addStudent -->
+
+    <div id = "overlay" v-if="showModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class = "modal-header">
+                    <h5 class = "modal-title">Add Students</h5>
+                    <button type="button" class="close" @click="showModal = false">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                 <div class = "modal-body p-4">
+                     <form v-on:submit.prevent = "addStudentData">
+                         <div class="form-group">
+                         <input type = "text" name = "firstName" class="form-control form-control-lg" placeholder="firstName" v-model="currentData.firstName"> 
+                         </div>
+                         <div class="form-group">
+                         <input type = "text" name = "lastName" class="form-control form-control-lg" placeholder="lastName" v-model="currentData.lastName"> 
+                         </div>
+                         <div class="form-group">
+                         <input type = "email" name = "email" class="form-control form-control-lg" placeholder="email" v-model="currentData.email"> 
+                         </div>
+                         <div class="form-group">
+                         <input type = "number" name = "number" class="form-control form-control-lg" placeholder="phone number" v-model="currentData.phone"> 
+                         </div>
+                         <div class="form-group">
+                         <input type = "text" name = "address" class="form-control form-control-lg" placeholder="address" v-model="currentData.address"> 
+                         </div>
+                         <div class="form-group">
+                         <b-button type = "submit" variant="primary" class="btn mr-3 btn-lg" @click="showModal = true">Save</b-button>
+                         <b-button variant="danger" class="btn mr-3 btn-lg" @click="showModal = false">Cancel</b-button>
+                         </div>
+                         </form>
+                 </div>
+            </div>
+        </div>
+    </div>
+  </div>      
+    
